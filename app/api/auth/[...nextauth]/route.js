@@ -16,38 +16,41 @@ const handler = NextAuth(
                 }
             )
         ],
-        async session({ session }) {
-            const sessionUser = await User.findOne({
-                email: session.user.email
-            })
-
-            session.user.id = sessionUser._id.toString()
-
-            return session
-        },
-        async signIn({ profile }) {
-            try {
-                await connectToDB()
-                //User exists or not?
-
-                const userExists = await User.findOne({
-                    email: profile.email
+        callbacks:
+        {
+            async session({ session }) {
+                const sessionUser = await User.findOne({
+                    email: session.user.email
                 })
 
-                if (!userExists) {
-                    await User.create({
-                        emaol: profile.email,
-                        username: profile.username.replace(" ", "").toLowerCase(),
-                        image: profile.image
-                    })
-                }
+                session.user.id = sessionUser._id.toString()
 
-                return true
-            } catch (error) {
-                console.log.apply(error)
-                return false
+                return session
+            },
+            async signIn({ profile }) {
+                try {
+                    await connectToDB()
+                    //User exists or not?
+
+                    const userExists = await User.findOne({
+                        email: profile.email
+                    })
+
+                    if (!userExists) {
+                        await User.create({
+                            email: profile.email,
+                            username: profile.name.replace(/\s+/g, "").toLowerCase(),
+                            image: profile.picture,
+                        });
+                    }
+
+                    return true
+                } catch (error) {
+                    console.log.apply(error)
+                    return false
+                }
             }
-        }
+        },
     }
 )
 
