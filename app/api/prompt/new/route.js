@@ -21,7 +21,7 @@ export const POST = async (req, res) => {
                 status: 201
             })
     } catch (error) {
-        return new Response("Failed to create prompt", { status: 500 })
+        return new Response(("Failed to create prompt"), { status: 500 })
 
     }
 }
